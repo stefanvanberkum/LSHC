@@ -19,7 +19,14 @@ def convert_binary(data):
     for i in range(len(data)):
         item = data[i]
         # Find model words in the title.
-        mw_title = re.findall("(?:^|(?<= ))([a-zA-Z0-9]*(?:(?:[0-9]+[^0-9\., ()]+)|(?:[^0-9\., ()]+[0-9]+))[a-zA-Z0-9]*)(?:$|(?= ))", item["title"])
+        # (?:^|(?<= )) matches either the start of the string, preceding whitespace, or an opening parenthesis (exactly once).
+        # [a-zA-Z0-9]* matches any alphanumeric character (zero or more times).
+        # (?:[0-9]+[^0-9\., ()]+) matches any (numeric) - (non numeric) combination.
+        # (?:[^0-9\., ()]+[0-9]+) matches any (non numeric) - (numeric) combination.
+        # (?:[0-9]+\.[0-9]+[^0-9\., ()]+) matches any (numeric) - . - (numeric) - (non-numeric) combination (i.e., decimals).
+        # [a-zA-Z0-9]* matches any alphanumeric character (zero or more times).
+        # (?:$|(?= )) matches either the end of the string, trailing whitespace (exactly once), or a closing parenthesis (exactly once).
+        mw_title = re.findall("(?:^|(?<= )|\()([a-zA-Z0-9]*(?:(?:[0-9]+[^0-9\., ()]+)|(?:[^0-9\., ()]+[0-9]+)|(?:[0-9]+\.[0-9]+[^0-9\., ()]+))[a-zA-Z0-9]*)(?:$|(?= )|\))", item["title"])
 
         for mw in mw_title:
             if mw in model_words:

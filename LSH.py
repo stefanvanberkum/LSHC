@@ -19,7 +19,7 @@ def convert_binary(data):
     for i in range(len(data)):
         item = data[i]
         # Find model words in the title.
-        mw_title = re.findall("([a-zA-Z0-9]*(?:(?:[0-9]+[^0-9., ]+)|(?:[^0-9., ]+[0-9]+))[a-zA-Z0-9]*)", item["title"])
+        mw_title = re.findall("(?:^|(?<= ))([a-zA-Z0-9]*(?:(?:[0-9]+[^0-9\., ()]+)|(?:[^0-9\., ()]+[0-9]+))[a-zA-Z0-9]*)(?:$|(?= ))", item["title"])
 
         for mw in mw_title:
             if mw in model_words:

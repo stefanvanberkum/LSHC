@@ -3,7 +3,6 @@ This module provides functions for loading and cleaning the data.
 """
 
 import json
-import random
 
 def load(file_path):
     """

@@ -3,9 +3,17 @@ This module provides functions for loading and cleaning the data.
 """
 
 import json
-
+import random
 
 def load(file_path):
+    """
+    Loads and cleans a JSON file of product occurences that are grouped by model ID (as in the TVs.JSON example).
+
+    :param file_path: the file path to a JSON file
+    :return: a cleaned and shuffled list of the data (as if we do not know the model type), and a copy of the cleaned
+    data.
+    """
+
     # Load data into dictionary.
     with open(file_path, "r") as file:
         data = json.load(file)
@@ -27,11 +35,12 @@ def load(file_path):
         for occurence in data[model]:
             # Clean title.
             for value in replacements:
-                features["title"] = features["title"].replace(value, replacements[value])
+                occurence["title"] = occurence["title"].replace(value, replacements[value])
 
             # Clean features map.
             features = occurence["featuresMap"]
             for key in features:
                 for value in replacements:
                     features[key] = features[key].replace(value, replacements[value])
-    return data
+            clean_list.append(occurence)
+    return clean_list, data

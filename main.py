@@ -5,6 +5,7 @@ https://github.com/stefanvanberkum/MSMP
 """
 
 from data_loader import load
+from LSH import lsh
 
 def main():
     """
@@ -15,8 +16,9 @@ def main():
 
     file_path = "data/TVs.json"
 
-    data = load(file_path)
-    print("")
+    data_list, data_dict = load(file_path)
+    lsh(data_list)
+    print()
 
 
 if __name__ == '__main__':

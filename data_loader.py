@@ -17,7 +17,7 @@ def load(file_path):
     with open(file_path, "r") as file:
         data = json.load(file)
 
-    # Declare common representations to be replaced by the last value of the list.
+    # Declare common value representations to be replaced by the last value of the list.
     inch = ["Inch", "inches", "\"", "-inch", " inch", "inch"]
     hz = ["Hertz", "hertz", "Hz", "HZ", " hz", "-hz", "hz"]
     to_replace = [inch, hz]

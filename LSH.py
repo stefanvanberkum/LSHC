@@ -5,6 +5,7 @@ This module provides LSH functionality, including the extraction of model words 
 import re
 from sympy import nextprime
 import random
+import numpy as np
 
 def lsh(data):
     binary_vec = convert_binary(data)
@@ -153,7 +154,8 @@ def minhash(binary_vec, n):
     Computes a MinHash signature matrix using n random hash functions, which will result in an n x c signature matrix,
     where c is the number of columns (items). These random hash functions are of the form (a + bx) mod k, where a and b
     are randomly generated integers, k is the smallest prime number that is larger than or equal to r (the original
-    number of rows in the r x c binary vector).
+    number of rows in the r x c binary vector). We use quick, vectorized, numpy operations to substantially reduce
+    computation time.
 
     :param binary_vec: a binary vector product representation
     :param n: the number of rows in the new signature matrix
@@ -164,34 +166,36 @@ def minhash(binary_vec, n):
 
     r = len(binary_vec)
     c = len(binary_vec[0])
+    binary_vec = np.array(binary_vec)
 
     # Find k.
     k = nextprime(r - 1)
 
     # Generate n random hash functions.
-    hash_params = []
+    hash_params = np.empty((n, 2))
     for i in range(n):
         # Generate a, b, and k.
         a = random.randint(1, k - 1)
         b = random.randint(1, k - 1)
-        hash_params.append([a, b])
+        hash_params[i, 0] = a
+        hash_params[i, 1] = b
 
     # Initialize signature matrix to infinity for each element.
-    signature = [[float('inf')] * c] * n
+    signature = np.full((n, c), np.inf)
 
     # Loop through the binary vector representation matrix once, to compute the signature matrix.
-    for row in range(r):
-
+    for row in range(1, r + 1):
         # Compute each of the n random hashes once for each row.
-        for i in range(n):
-            row_hash = (hash_params[i][0] + hash_params[i][1] * row) % k
+        e = np.ones(n)
+        row_vec = np.full(n, row)
+        x = np.stack((e, row_vec), axis=1)
+        row_hash = np.sum(hash_params * x, axis=1) % k
 
-            # Loop through all columns j (item), and update its value if and only if it contains a one and its current
-            # value is larger than the hash value for the signature matrix row i.
-            for j in range(c):
-                if binary_vec[row][j] == 1:
-                    if signature[i][j] > row_hash:
-                        signature[i][j] = row_hash
+        for i in range(n):
+            # Update column j if and only if it contains a one and its current value is larger than the hash value for
+            # the signature matrix row i.
+            updates = np.where(binary_vec[row - 1] == 0, np.inf, row_hash[i])
+            signature[i] = np.where(updates < signature[i], row_hash[i], signature[i])
     return signature
 
 

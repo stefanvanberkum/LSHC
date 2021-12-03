@@ -3,9 +3,12 @@ This module provides LSH functionality, including the extraction of model words 
 """
 
 import re
+from sympy import nextprime
+import random
 
 def lsh(data):
-    convert_binary(data)
+    binary_vec = convert_binary(data)
+    signature = minhash(binary_vec, round(0.5 * len(binary_vec)))
 
 
 def lsh_old(data):
@@ -145,11 +148,60 @@ def convert_binary_old(data):
     return binary_vec
 
 
-def minhash(data):
-    print()
+def minhash(binary_vec, n):
+    """
+    Computes a MinHash signature matrix using n random hash functions, which will result in an n x c signature matrix,
+    where c is the number of columns (items). These random hash functions are of the form (a + bx) mod k, where a and b
+    are randomly generated integers, k is the smallest prime number that is larger than or equal to r (the original
+    number of rows in the r x c binary vector).
+
+    :param binary_vec: a binary vector product representation
+    :param n: the number of rows in the new signature matrix
+    :return: the signature matrix
+    """
+
+    random.seed(0)
+
+    r = len(binary_vec)
+    c = len(binary_vec[0])
+
+    # Find k.
+    k = nextprime(r - 1)
+
+    # Generate n random hash functions.
+    hash_params = []
+    for i in range(n):
+        # Generate a, b, and k.
+        a = random.randint(1, k - 1)
+        b = random.randint(1, k - 1)
+        hash_params.append([a, b])
+
+    # Initialize signature matrix to infinity for each element.
+    signature = [[float('inf')] * c] * n
+
+    # Loop through the binary vector representation matrix once, to compute the signature matrix.
+    for row in range(r):
+
+        # Compute each of the n random hashes once for each row.
+        for i in range(n):
+            row_hash = (hash_params[i][0] + hash_params[i][1] * row) % k
+
+            # Loop through all columns j (item), and update its value if and only if it contains a one and its current
+            # value is larger than the hash value for the signature matrix row i.
+            for j in range(c):
+                if binary_vec[row][j] == 1:
+                    if signature[i][j] > row_hash:
+                        signature[i][j] = row_hash
+    return signature
 
 
 def common_binary(data):
+    """
+    Finds and reports the most common binary and numeric features.
+
+    :param data: a list of items
+    :return:
+    """
     feature_count = dict()
 
     # Loop through all items to identify common binary features.

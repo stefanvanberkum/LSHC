@@ -6,14 +6,7 @@ import re
 from sympy import nextprime
 import random
 import numpy as np
-
-def lsh(data):
-    binary_vec = convert_binary(data)
-    signature = minhash(binary_vec, round(0.5 * len(binary_vec)))
-
-
-def lsh_old(data):
-    convert_binary_old(data)
+import sys
 
 
 def convert_binary(data):
@@ -159,7 +152,7 @@ def minhash(binary_vec, n):
 
     :param binary_vec: a binary vector product representation
     :param n: the number of rows in the new signature matrix
-    :return: the signature matrix
+    :return: the signature matrix (a NumPy array)
     """
 
     random.seed(0)
@@ -196,7 +189,56 @@ def minhash(binary_vec, n):
             # the signature matrix row i.
             updates = np.where(binary_vec[row - 1] == 0, np.inf, row_hash[i])
             signature[i] = np.where(updates < signature[i], row_hash[i], signature[i])
-    return signature
+    return signature.astype(int)
+
+
+def lsh(signature, t):
+    """
+    Performs Locality Sensitive Hashing (LSH) based on a previously obtained MinHash matrix.
+
+    :param signature: the MinHash signature matrix
+    :param t: the approximate threshold value at which Pr[candidate] =~ 1/2
+    :return: a binary matrix with a one if two elements are candidate pairs, and zero otherwise
+    """
+
+    n = len(signature)
+
+    # Compute the approximate number of bands and rows from the threshold t, using that n = r * b, and t is
+    # approximately (1/b)^(1/r).
+    r_best = 1
+    b_best = 1
+    best = 1
+    for r in range(1, n + 1):
+        for b in range(1, n + 1):
+            if r * b == n:
+                # Valid pair.
+                approximation = (1 / b)**(1 / r)
+                if abs(approximation - t) < abs(best - t):
+                    best = approximation
+                    r_best = r
+                    b_best = b
+
+    candidates = np.zeros((len(signature[0]), len(signature[0])))
+    for band in range(b_best):
+        buckets = dict()
+        start_row = r_best * band    # Inclusive.
+        end_row = r_best * (band + 1)    # Exclusive.
+        strings = ["".join(signature[start_row:end_row, column].astype(str)) for column in range(len(signature[0]))]
+        ints = [int(string) for string in strings]
+        hashes = [integer % sys.maxsize for integer in ints]
+
+        # Add all item hashes to the correct bucket.
+        for item in range(len(hashes)):
+            hash_value = hashes[item]
+            if hash_value in buckets:
+
+                # All items already in this bucket are possible duplicates of this item.
+                for candidate in buckets[hash_value]:
+                    candidates[item, candidate] = 1
+                buckets[hash_value].append(item)
+            else:
+                buckets[hash_value] = [item]
+    return candidates
 
 
 def common_binary(data):
@@ -223,7 +265,7 @@ def common_binary(data):
                 else:
                     feature_count[key] = 1
 
-    count_list = [(v,k) for k,v in feature_count.items()]
+    count_list = [(v, k) for k, v in feature_count.items()]
     count_list.sort(reverse=True)
     for feature in count_list:
         print(feature[1], feature[0])

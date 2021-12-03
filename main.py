@@ -5,7 +5,7 @@ https://github.com/stefanvanberkum/MSMP
 """
 
 from data_loader import load
-from LSH import common_binary, lsh, lsh_old
+from LSH import common_binary, convert_binary, convert_binary_old, minhash, lsh
 import time
 
 def main():
@@ -16,7 +16,7 @@ def main():
     """
 
     identify_common_binary = False
-    run_msm = True
+    run_lsh = True
 
     file_path = "data/TVs.json"
 
@@ -27,13 +27,19 @@ def main():
     if identify_common_binary:
         common_binary(data_list)
 
-    if run_msm:
-        lsh(data_list)
-        lsh_old(data_list)
+    if run_lsh:
+        do_lsh(data_list, 0.8)
 
     end_time = time.time()
     print("Elapsed time:", end_time - start_time, "seconds")
 
+
+def do_lsh(data_list, t):
+    binary_vec = convert_binary(data_list)
+    n = round(round(0.5 * len(binary_vec)) / 100) * 100
+    signature = minhash(binary_vec, n)
+    candidates = lsh(signature, t)
+    print()
 
 if __name__ == '__main__':
     main()

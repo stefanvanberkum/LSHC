@@ -105,7 +105,7 @@ def do_lsh(data_list, duplicates, t):
     pq = n_correct / comparisons
 
     # Compute Pair Completeness (PC)
-    pc = n_correct / np.sum(duplicates)
+    pc = n_correct / (np.sum(duplicates) / 2)
 
     # Compute F_1 measure.
     f1 = 2 * pq * pc / (pq + pc)
@@ -145,7 +145,7 @@ def do_lsh_old(data_list, duplicates, t):
     pq = n_correct / comparisons
 
     # Compute Pair Completeness (PC)
-    pc = n_correct / np.sum(duplicates)
+    pc = n_correct / (np.sum(duplicates) / 2)
 
     # Compute F_1 measure.
     f1 = 2 * pq * pc / (pq + pc)

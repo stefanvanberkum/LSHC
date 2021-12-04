@@ -4,13 +4,14 @@ This module provides functions for loading and cleaning the data.
 
 import json
 
+
 def load(file_path):
     """
     Loads and cleans a JSON file of product occurences that are grouped by model ID (as in the TVs.JSON example).
 
     :param file_path: the file path to a JSON file
-    :return: a cleaned and shuffled list of the data (as if we do not know the model type), and a copy of the cleaned
-    data.
+    :return: a cleaned list of the data (as if we do not know the model type), and a binary matrix with element (i, j)
+    equal to one if item i and item j are duplicates.
     """
 
     # Load data into dictionary.
@@ -42,4 +43,15 @@ def load(file_path):
                 for value in replacements:
                     features[key] = features[key].replace(value, replacements[value])
             clean_list.append(occurence)
-    return clean_list, data
+
+    # Compute binary matrix of duplicates, where element (i, j) is one if i and j are duplicates, for i != j, and zero
+    # otherwise. Note that this matrix will be symmetric.
+    duplicates = [[0] * len(clean_list)] * len(clean_list)
+    for i in range(len(clean_list)):
+        model_i = clean_list[i]["modelID"]
+        for j in range(i + 1, len(clean_list)):
+            model_j = clean_list[j]["modelID"]
+            if model_i == model_j:
+                duplicates[i][j] = 1
+                duplicates[j][i] = 1
+    return clean_list, duplicates

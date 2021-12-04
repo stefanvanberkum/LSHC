@@ -2,11 +2,12 @@
 This module provides LSH functionality, including the extraction of model words and MinHash.
 """
 
-import re
-from sympy import nextprime
 import random
-import numpy as np
+import re
 import sys
+
+import numpy as np
+from sympy import nextprime
 
 
 def convert_binary(data):
@@ -30,14 +31,20 @@ def convert_binary(data):
     for i in range(len(data)):
         item = data[i]
         # Find model words in the title.
-        # (?:^|(?<=[ \[\(])) matches either the start of the string, preceding whitespace, or an opening parenthesis or bracket (exactly once).
+        # (?:^|(?<=[ \[\(])) matches either the start of the string, preceding whitespace, or an opening parenthesis
+        # or bracket (exactly once).
         # [a-zA-Z0-9]* matches any alphanumeric character (zero or more times).
         # (?:[0-9]+[^0-9\., ()]+) matches any (numeric) - (non numeric) combination.
         # (?:[^0-9\., ()]+[0-9]+) matches any (non numeric) - (numeric) combination.
-        # (?:[0-9]+\.[0-9]+[^0-9\., ()]+) matches any (numeric) - . - (numeric) - (non-numeric) combination (i.e., decimals).
+        # (?:[0-9]+\.[0-9]+[^0-9\., ()]+) matches any (numeric) - . - (numeric) - (non-numeric) combination (i.e.,
+        # decimals).
         # [a-zA-Z0-9]* matches any alphanumeric character (zero or more times).
-        # (?:$|(?=[ \)\]])) matches either the end of the string, trailing whitespace, or a closing parenthesis or bracket (exactly once).
-        mw_title = re.findall("(?:^|(?<=[ \[\(]))([a-zA-Z0-9]*(?:(?:[0-9]+[^0-9\., ()]+)|(?:[^0-9\., ()]+[0-9]+)|(?:[0-9]+\.[0-9]+[^0-9\., ()]+))[a-zA-Z0-9]*)(?:$|(?=[ \)\]]))", item["title"])
+        # (?:$|(?=[ \)\]])) matches either the end of the string, trailing whitespace, or a closing parenthesis or
+        # bracket (exactly once).
+        mw_title = re.findall(
+            "(?:^|(?<=[ \[\(]))([a-zA-Z0-9]*(?:(?:[0-9]+[^0-9\., ()]+)|(?:[^0-9\., ()]+[0-9]+)|(?:[0-9]+\.[0-9]+["
+            "^0-9\., ()]+))[a-zA-Z0-9]*)(?:$|(?=[ \)\]]))",
+            item["title"])
         item_mw = mw_title
 
         # Find model words in the key-value pairs.
@@ -116,7 +123,8 @@ def convert_binary_old(data):
             value = features[key]
 
             # Find decimals.
-            # (?:(^[0-9]+(?:\.[0-9]+))[a-zA-Z]+$) matches any (numeric) - . - (numeric) - (non-numeric) combination (i.e., decimals).
+            # (?:(^[0-9]+(?:\.[0-9]+))[a-zA-Z]+$) matches any (numeric) - . - (numeric) - (non-numeric) combination (
+            # i.e., decimals).
             # (^[0-9](?:\.[0-9]+)$)) matches any (numeric) - . - (numeric) combination (i.e., decimals).
             # [a-zA-Z0-9]+ matches any alphanumeric character (one or more times).
             mw_decimal = re.findall("(?:(?:(^[0-9]+(?:\.[0-9]+))[a-zA-Z]+$)|(^[0-9](?:\.[0-9]+)$))", value)
@@ -155,7 +163,7 @@ def minhash(binary_vec, n):
     :return: the signature matrix (a NumPy array)
     """
 
-    random.seed(0)
+    random.seed(1)
 
     r = len(binary_vec)
     c = len(binary_vec[0])
@@ -212,7 +220,7 @@ def lsh(signature, t):
         for b in range(1, n + 1):
             if r * b == n:
                 # Valid pair.
-                approximation = (1 / b)**(1 / r)
+                approximation = (1 / b) ** (1 / r)
                 if abs(approximation - t) < abs(best - t):
                     best = approximation
                     r_best = r
@@ -221,8 +229,8 @@ def lsh(signature, t):
     candidates = np.zeros((len(signature[0]), len(signature[0])))
     for band in range(b_best):
         buckets = dict()
-        start_row = r_best * band    # Inclusive.
-        end_row = r_best * (band + 1)    # Exclusive.
+        start_row = r_best * band  # Inclusive.
+        end_row = r_best * (band + 1)  # Exclusive.
         strings = ["".join(signature[start_row:end_row, column].astype(str)) for column in range(len(signature[0]))]
         ints = [int(string) for string in strings]
         hashes = [integer % sys.maxsize for integer in ints]
@@ -239,7 +247,7 @@ def lsh(signature, t):
                 buckets[hash_value].append(item)
             else:
                 buckets[hash_value] = [item]
-    return candidates
+    return candidates.astype(int)
 
 
 def common_binary(data):

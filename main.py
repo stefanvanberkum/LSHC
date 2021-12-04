@@ -94,7 +94,7 @@ def do_lsh(data_list, duplicates, t):
 
     # Compute number of comparisons.
     comparisons = np.sum(candidates) / 2
-    comparison_frac = comparisons / comb(len(data_list))
+    comparison_frac = comparisons / comb(len(data_list), 2)
 
     # Compute matrix of correctly binned duplicates, where element (i, j) is equal to one if item i and item j are
     # duplicates, and correctly classified as such by LSH.
@@ -134,7 +134,7 @@ def do_lsh_old(data_list, duplicates, t):
 
     # Compute number of comparisons.
     comparisons = np.sum(candidates) / 2
-    comparison_frac = comparisons / comb(len(data_list))
+    comparison_frac = comparisons / comb(len(data_list), 2)
 
     # Compute matrix of correctly binned duplicates, where element (i, j) is equal to one if item i and item j are
     # duplicates, and correctly classified as such by LSH.

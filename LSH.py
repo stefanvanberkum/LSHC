@@ -235,6 +235,7 @@ def lsh(signature, t):
                 # All items already in this bucket are possible duplicates of this item.
                 for candidate in buckets[hash_value]:
                     candidates[item, candidate] = 1
+                    candidates[candidate, item] = 1
                 buckets[hash_value].append(item)
             else:
                 buckets[hash_value] = [item]

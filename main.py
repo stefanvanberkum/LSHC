@@ -7,6 +7,7 @@ https://github.com/stefanvanberkum/MSMP
 from data_loader import load
 from LSH import common_binary, convert_binary, convert_binary_old, minhash, lsh
 import time
+import numpy as np
 
 def main():
     """
@@ -39,7 +40,17 @@ def do_lsh(data_list, t):
     n = round(round(0.5 * len(binary_vec)) / 100) * 100
     signature = minhash(binary_vec, n)
     candidates = lsh(signature, t)
-    print()
+
+    # Computes number of comparisons.
+    comparisons = np.sum(candidates) / 2
+
+
+    # TODO:
+    # Add bootstraps.
+    # Compute completeness, quality, and F1 measures.
+    # Count how many comparisons we need to make.
+    # Print results for bootstraps using different values of t.
+    # IDEA: create a matrix of true duplicates, compute vectorized measures based on this.
 
 if __name__ == '__main__':
     main()

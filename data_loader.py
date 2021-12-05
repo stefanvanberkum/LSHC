@@ -3,6 +3,9 @@ This module provides functions for loading and cleaning the data.
 """
 
 import json
+from random import shuffle
+
+import numpy as np
 
 
 def load(file_path):
@@ -44,9 +47,12 @@ def load(file_path):
                     features[key] = features[key].replace(value, replacements[value])
             clean_list.append(occurence)
 
+    # Normally we will not be given adjacent duplicates, so shuffle the item list.
+    shuffle(clean_list)
+
     # Compute binary matrix of duplicates, where element (i, j) is one if i and j are duplicates, for i != j, and zero
     # otherwise. Note that this matrix will be symmetric.
-    duplicates = [[0] * len(clean_list)] * len(clean_list)
+    duplicates = np.zeros((len(clean_list), len(clean_list)))
     for i in range(len(clean_list)):
         model_i = clean_list[i]["modelID"]
         for j in range(i + 1, len(clean_list)):
@@ -54,4 +60,4 @@ def load(file_path):
             if model_i == model_j:
                 duplicates[i][j] = 1
                 duplicates[j][i] = 1
-    return clean_list, duplicates
+    return clean_list, duplicates.astype(int)

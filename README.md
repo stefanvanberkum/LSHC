@@ -1,4 +1,4 @@
-# MSMP
+# LSHC
 
 ## Set-up instructions:
 - Set-up a virtual environment in Python 3.9.

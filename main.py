@@ -9,6 +9,7 @@ import time
 from math import comb
 
 import numpy as np
+import spacy
 
 from LSH import convert_binary, convert_binary_alt, convert_binary_old, minhash, lsh, common_count
 from data_loader import load
@@ -26,13 +27,15 @@ def main():
     write_result = True
 
     thresholds = [x / 100 for x in range(5, 100, 5)]
-    bootstraps = 10
+    bootstraps = 1
     random.seed(0)
 
     file_path = "data/TVs.json"
     result_path = "results/"
 
     start_time = time.time()
+
+    spacy.load("en_core_web_md")
 
     data_list, duplicates = load(file_path)
 
@@ -217,6 +220,15 @@ def bootstrap(data_list, duplicates):
     data_sample = [data_list[index] for index in indices]
     duplicates_sample = np.take(np.take(duplicates, indices, axis=0), indices, axis=1)
     return data_sample, duplicates_sample
+
+
+def cluster(binary_vec, candidates):
+    similarities = []
+    for i in range(len(candidates)):
+        for j in range(i + 1, len(candidates)):
+            if candidates[i, j] == 1:
+                # (i, j) candidate pair.
+                similarities.append([i, j])
 
 
 if __name__ == '__main__':

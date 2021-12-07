@@ -47,7 +47,7 @@ def convert_binary(data):
             item["title"])
         item_mw = []
         for match in mw_title:
-            if mw_title[0] != '':
+            if match[0] != '':
                 item_mw.append(match[0])
             else:
                 item_mw.append(match[1])

@@ -29,7 +29,7 @@ def main():
     write_result = True
 
     thresholds = [x / 100 for x in range(5, 100, 5)]
-    bootstraps = 1
+    bootstraps = 5
     random.seed(0)
 
     file_path = "data/TVs.json"

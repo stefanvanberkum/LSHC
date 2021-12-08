@@ -1,5 +1,7 @@
 # LSHC
 
+Locality Sensitive Hashing with Clustering (LSHC) for product duplicate detection.
+
 ## Set-up instructions:
 
 - Set-up a virtual environment in Python 3.9.

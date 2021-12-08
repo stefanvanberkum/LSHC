@@ -29,7 +29,7 @@ def main():
     write_result = True
 
     thresholds = [x / 100 for x in range(5, 100, 5)]
-    bootstraps = 5
+    bootstraps = 1
     random.seed(0)
 
     file_path = "data/TVs.json"
@@ -268,9 +268,9 @@ def cluster(data_list, candidates, duplicates):
                 mw_title_i = ""
                 for match in mw_i:
                     if mw_i[0] != '':
-                        mw_title_i += match[0]
+                        mw_title_i += " " + match[0]
                     else:
-                        mw_title_i += match[1]
+                        mw_title_i += " " + match[1]
                 mw_j = re.findall(
                     "(?:^|(?<=[ \[\(]))([a-zA-Z0-9]*(?:(?:[0-9]+[^0-9\., ()]+)|(?:[^0-9\., ()]+[0-9]+)|(?:([0-9]+\.["
                     "0-9]+)[^0-9\., ()]+))[a-zA-Z0-9]*)(?:$|(?=[ \)\]]))",
@@ -278,9 +278,9 @@ def cluster(data_list, candidates, duplicates):
                 mw_title_j = ""
                 for match in mw_j:
                     if mw_j[0] != '':
-                        mw_title_j += match[0]
+                        mw_title_j += " " + match[0]
                     else:
-                        mw_title_j += match[1]
+                        mw_title_j += " " + match[1]
                 titles.append([mw_title_i, mw_title_j])
 
                 if duplicates[i, j] == 1:

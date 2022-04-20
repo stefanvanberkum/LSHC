@@ -4,7 +4,7 @@ Locality sensitive hashing with clustering (LSHC) for product duplicate detectio
 
 ## Installation
 
-- Set up a virtual environment using Python 3.9.
+- Create a virtual environment using Python 3.9.
 - Install the requirements by running the following command in your virtual environment: ```conda install --file requirements.txt``` (or ```pip install -r requirements.txt```).
 - Install English spacy model by running the following command: ```python -m spacy download en_core_web_md```.
 - You can open and edit the code in any editor, we used the PyCharm IDE: https://www.jetbrains.com/pycharm/.

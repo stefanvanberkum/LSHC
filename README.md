@@ -1,6 +1,6 @@
 # LSHC
 
-Locality Sensitive Hashing with Clustering (LSHC) for product duplicate detection.
+Locality sensitive hashing with clustering (LSHC) for product duplicate detection.
 
 ## Set-up instructions:
 
